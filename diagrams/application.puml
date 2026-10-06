@@ -1,0 +1,53 @@
+@startuml PrioMed_Application_Components
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+skinparam defaultTextAlignment center
+skinparam component {
+  BackgroundColor White
+  BorderColor #028090
+  FontColor #18292A
+}
+skinparam database {
+  BackgroundColor #028090
+  BorderColor #028090
+  FontColor White
+}
+skinparam actor {
+  BackgroundColor #00A896
+  BorderColor #00A896
+  FontColor White
+}
+
+actor "IPS / Specialist" as IPS
+actor "Ministry /\nRegulator" as Ministry
+
+component "Referral\nPortal (Client)" as Client
+component "API Gateway" as Gateway #028090
+component "Authentication\nService" as Auth
+component "Referral\nService" as Referral
+component "Classification\nService" as Classification
+component "Explanation\nService" as Explanation
+component "Scheduling API" as Scheduling #FFFFFF
+component "MGTE Compliance\nAPI" as MGTE #FFFFFF
+
+database "PostgreSQL\nDB" as PostgreSQL
+component "Object\nStorage" as ObjectStorage
+database "Redis\nCache" as Redis
+
+Client --> Gateway
+Gateway --> Auth
+Gateway --> Referral
+Gateway --> Classification
+Gateway --> Explanation
+
+Auth --> PostgreSQL
+Referral --> ObjectStorage
+Explanation --> Redis
+Classification --> MGTE
+
+MGTE --> Ministry
+
+Referral --> Scheduling
+Scheduling --> IPS
+
+@enduml
