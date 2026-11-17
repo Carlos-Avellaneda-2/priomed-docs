@@ -17,4 +17,12 @@ la versión corregida está en `figures/fig2_application.png`.
 Regenerar figuras: `cd figures/source && python make_fig1.py && python make_fig2.py && python make_fig3.py`
 (requiere matplotlib). Regenerar la presentación: `cd presentation && node build_deck.js` (requiere pptxgenjs).
 
-Repos relacionados: `priomed-classification-service`, `priomed-infra`.
+## Publicación en el portal
+
+El despliegue de `priomed-infra` (`deploy/deploy-ec2.sh`) copia el artículo, la presentación y las
+figuras 1 a 3 al portal web de PrioMed, en la sección «Artículo y figuras»
+(`http://priomed.<IP>.nip.io/#documentos`). Si regeneras una figura o el artículo, vuelve a correr
+el script de despliegue para publicar la versión nueva.
+
+Repos relacionados: `priomed-classification-service` (API de clasificación), `priomed-infra`
+(despliegue y portal web).
