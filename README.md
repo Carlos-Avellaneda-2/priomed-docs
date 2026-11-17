@@ -11,8 +11,9 @@ speech/         Guion de exposición
 research/       Estado del arte del foco técnico + ADRs
 ```
 
-Nota: el .docx en `paper/` aún embebe la versión anterior de la Figura 2 (flecha mal enrutada);
-la versión corregida está en `figures/fig2_application.png`.
+El artículo incluye la sección 7.5 «Referral Portal Prototype», que describe el portal web del
+prototipo (Figuras 4 y 5, tomadas del despliegue en EC2), y ya embebe la versión corregida de la
+Figura 2.
 
 Regenerar figuras: `cd figures/source && python make_fig1.py && python make_fig2.py && python make_fig3.py`
 (requiere matplotlib). Regenerar la presentación: `cd presentation && node build_deck.js` (requiere pptxgenjs).
