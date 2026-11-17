@@ -15,6 +15,11 @@ El artículo incluye la sección 7.5 «Referral Portal Prototype», que describe
 prototipo (Figuras 4 y 5, tomadas del despliegue en EC2), y ya embebe la versión corregida de la
 Figura 2.
 
+La presentación (17 diapositivas) incluye el prototipo desplegado: arquitectura real en EC2, el
+portal web y los resultados sobre datos sintéticos. El guion de `speech/guion_exposicion.md` se
+copia como notas del orador al generar la presentación: cada sección `## N · Título` corresponde a
+la diapositiva N, así que si editas el guion vuelve a generar el .pptx.
+
 Regenerar figuras: `cd figures/source && python make_fig1.py && python make_fig2.py && python make_fig3.py`
 (requiere matplotlib). Regenerar la presentación: `cd presentation && node build_deck.js` (requiere pptxgenjs).
 

@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const pptxgen = require("pptxgenjs");
 
 const TEAL = "028090";
@@ -14,14 +16,22 @@ const pres = new pptxgen();
 pres.layout = "LAYOUT_WIDE"; // 13.3 x 7.5
 const W = 13.33, H = 7.5;
 
+// Registro de diapositivas: numeración automática y notas del orador desde el guion.
+const slides = [];
+function newSlide() {
+  const s = pres.addSlide();
+  slides.push(s);
+  return s;
+}
+
 function darkBg(slide) {
   slide.background = { color: DARK };
 }
 function lightBg(slide) {
   slide.background = { color: WHITE };
 }
-function pageNum(slide, n) {
-  slide.addText(String(n), {
+function pageNum(slide) {
+  slide.addText(String(slides.indexOf(slide) + 1), {
     x: W - 0.7, y: H - 0.5, w: 0.4, h: 0.3,
     fontFace: "Calibri", fontSize: 10, color: MUTE, align: "right",
   });
@@ -43,7 +53,7 @@ function title(slide, text, opts = {}) {
 
 // ---------- Slide 1: Title ----------
 {
-  const s = pres.addSlide();
+  const s = newSlide();
   darkBg(s);
   s.addShape("rect", { x: 0, y: 0, w: 5.3, h: H, fill: { color: "052F35" }, line: { type: "none" } });
   s.addShape("ellipse", { x: 3.6, y: 4.6, w: 3.4, h: 3.4, fill: { color: TEAL, transparency: 70 }, line: { type: "none" } });
@@ -71,7 +81,7 @@ function title(slide, text, opts = {}) {
 
 // ---------- Slide 2: El problema (evidencia) ----------
 {
-  const s = pres.addSlide();
+  const s = newSlide();
   lightBg(s);
   kicker(s, "El problema");
   title(s, "El acceso a especialista en Colombia se está deteriorando");
@@ -98,12 +108,12 @@ function title(slide, text, opts = {}) {
     { text: "El Ministerio de Salud emitió la Circular 038 de 2025 e implementa el Modelo de Gestión de Tiempos de Espera (MGTE), exigiendo umbrales y algoritmos de priorización explícitos por especialidad. Ya existe una referencia normativa contra la cual medir cualquier propuesta.", options: { color: "DDEDEE" } },
   ], { x: 0.95, y: 5.25, w: 11.4, h: 1.2, fontFace: "Calibri", fontSize: 13, lineSpacingMultiple: 1.25, valign: "middle" });
 
-  pageNum(s, 2);
+  pageNum(s);
 }
 
 // ---------- Slide 3: Stakeholders y hallazgo clínico ----------
 {
-  const s = pres.addSlide();
+  const s = newSlide();
   lightBg(s);
   kicker(s, "Contexto clínico y actores");
   title(s, "Un mismo flujo de triage mezcla síntomas de severidad muy distinta");
@@ -137,12 +147,12 @@ function title(slide, text, opts = {}) {
     { text: "un error de clasificación no cuesta lo mismo en todos los casos. Subestimar la severidad de un dolor torácico es cualitativamente más grave que subestimarla en una rinorrea.", options: { color: "DDEDEE" } },
   ], { x: 7.25, y: 4.7, w: 5.15, h: 1.7, fontFace: "Calibri", fontSize: 13, lineSpacingMultiple: 1.3 });
 
-  pageNum(s, 3);
+  pageNum(s);
 }
 
 // ---------- Slide 4: Estado del arte comparativo ----------
 {
-  const s = pres.addSlide();
+  const s = newSlide();
   lightBg(s);
   kicker(s, "Estado del arte");
   title(s, "Tres familias de enfoques — y un patrón de riesgo que se repite");
@@ -169,12 +179,12 @@ function title(slide, text, opts = {}) {
     { text: "los modelos automatizados fallan más justo en los casos de urgencia intermedia y alta severidad — los más costosos de clasificar mal — y ningún estudio evalúa esto contra los umbrales oficiales del MGTE colombiano.", options: { color: INK } },
   ], { x: 0.6, y: 5.95, w: 12.1, h: 0.9, fontFace: "Calibri", fontSize: 13, lineSpacingMultiple: 1.25 });
 
-  pageNum(s, 4);
+  pageNum(s);
 }
 
 // ---------- Slide 5: Propuesta general ----------
 {
-  const s = pres.addSlide();
+  const s = newSlide();
   lightBg(s);
   kicker(s, "Propuesta general");
   title(s, "Capacidad de negocio y alternativas a investigar");
@@ -200,12 +210,12 @@ function title(slide, text, opts = {}) {
     s.addText(a.d, { x: x + 0.25, y: y + 1.05, w: cardW - 0.5, h: 1.8, fontFace: "Calibri", fontSize: 11.5, color: INK, lineSpacingMultiple: 1.2 });
   });
 
-  pageNum(s, 5);
+  pageNum(s);
 }
 
 // ---------- Slide 6: Arquitectura empresarial (Figura 1) ----------
 {
-  const s = pres.addSlide();
+  const s = newSlide();
   lightBg(s);
   kicker(s, "Sección 5 · Arquitectura empresarial");
   title(s, "PrioMed: intermediario transparente entre remisión y agenda");
@@ -225,12 +235,12 @@ function title(slide, text, opts = {}) {
     s.addText(r.d, { x: 9.2, y: y + 0.5, w: 3.3, h: 0.7, fontFace: "Calibri", fontSize: 11, color: INK, lineSpacingMultiple: 1.15 });
   });
 
-  pageNum(s, 6);
+  pageNum(s);
 }
 
 // ---------- Slide 7: Gobernanza y Roadmap ----------
 {
-  const s = pres.addSlide();
+  const s = newSlide();
   lightBg(s);
   kicker(s, "Sección 5 · Gobernanza y hoja de ruta");
   title(s, "Quién decide, y en qué orden se construye");
@@ -250,7 +260,7 @@ function title(slide, text, opts = {}) {
 
   s.addText("Hoja de ruta por fases", { x: 6.9, y: 1.95, w: 5.9, h: 0.4, fontFace: "Calibri", fontSize: 14, bold: true, color: TEAL });
   const phases = [
-    { p: "Fase 0", d: "Motor de clasificación sobre datos sintéticos/abiertos (este semestre)" },
+    { p: "Fase 0", d: "Motor de clasificación y portal sobre datos sintéticos (desplegada)" },
     { p: "Fase 1", d: "Piloto con una IPS/EPS socia" },
     { p: "Fase 2", d: "Multi-tenant, explicación LLM y reporte de cumplimiento" },
     { p: "Fase 3", d: "Interoperabilidad con RIPS, MIPRES, SISPRO" },
@@ -265,12 +275,12 @@ function title(slide, text, opts = {}) {
     ], { x: 7.4, y: y - 0.02, w: 5.3, h: 0.6, fontFace: "Calibri", fontSize: 11.5, lineSpacingMultiple: 1.15, valign: "top" });
   });
 
-  pageNum(s, 7);
+  pageNum(s);
 }
 
 // ---------- Slide 8: Escenarios de calidad ----------
 {
-  const s = pres.addSlide();
+  const s = newSlide();
   darkBg(s);
   s.addText("SECCIÓN 5.4 · ATRIBUTOS DE CALIDAD", {
     x: 0.6, y: 0.45, w: 8, h: 0.35, fontFace: "Calibri", fontSize: 13, bold: true, color: SEA, charSpacing: 2,
@@ -294,12 +304,12 @@ function title(slide, text, opts = {}) {
     s.addText(sc.d, { x: x + 0.2, y: y + 1.75, w: cardW - 0.4, h: 2.0, fontFace: "Calibri", fontSize: 10.5, color: "C7DCDD", lineSpacingMultiple: 1.25 });
   });
 
-  pageNum(s, 8);
+  pageNum(s);
 }
 
 // ---------- Slide 9: Datos + Pipeline inteligente ----------
 {
-  const s = pres.addSlide();
+  const s = newSlide();
   lightBg(s);
   kicker(s, "Sección 6 · Datos e inteligencia");
   title(s, "Las tres alternativas, unidas en un solo pipeline por capas");
@@ -328,12 +338,12 @@ function title(slide, text, opts = {}) {
     s.addText(st.d, { x: x + 0.2, y: y + 0.75, w: cardW - 0.4, h: 0.7, fontFace: "Calibri", fontSize: 10.5, color: INK, lineSpacingMultiple: 1.15 });
   });
 
-  pageNum(s, 9);
+  pageNum(s);
 }
 
 // ---------- Slide 10: Arquitectura de aplicación (Figura 2) ----------
 {
-  const s = pres.addSlide();
+  const s = newSlide();
   lightBg(s);
   kicker(s, "Sección 7.1 · Arquitectura de aplicación");
   title(s, "Servicios desacoplados, con perfiles de carga distintos");
@@ -349,12 +359,12 @@ function title(slide, text, opts = {}) {
     x: 9.15, y: 2.1, w: 3.6, h: 4.3, fontFace: "Calibri", fontSize: 12.5, color: INK, lineSpacingMultiple: 1.2, valign: "top",
   });
 
-  pageNum(s, 10);
+  pageNum(s);
 }
 
 // ---------- Slide 11: Tecnología y despliegue en la nube (Figura 3) ----------
 {
-  const s = pres.addSlide();
+  const s = newSlide();
   lightBg(s);
   kicker(s, "Sección 7.2–7.3 · Tecnología y despliegue");
   title(s, "AWS con separación de subredes según el nivel de exposición");
@@ -374,12 +384,136 @@ function title(slide, text, opts = {}) {
     s.addText(n.d, { x: 9.5, y: y + 0.22, w: 3.3, h: 0.7, fontFace: "Calibri", fontSize: 10.5, color: INK, lineSpacingMultiple: 1.15 });
   });
 
-  pageNum(s, 11);
+  pageNum(s);
 }
 
-// ---------- Slide 12: Seguridad ----------
+// ---------- Slide 12: Lo que está desplegado hoy ----------
 {
-  const s = pres.addSlide();
+  const s = newSlide();
+  lightBg(s);
+  kicker(s, "Prototipo Fase 0 · Despliegue real");
+  title(s, "Del plan al prototipo: lo que está desplegado hoy");
+
+  // Navegador
+  s.addShape("roundRect", { x: 0.6, y: 2.45, w: 2.1, h: 0.9, rectRadius: 0.07, fill: { color: WHITE }, line: { color: DARK, width: 1.25 } });
+  s.addText("Revisor\n(navegador)", { x: 0.6, y: 2.45, w: 2.1, h: 0.9, fontFace: "Calibri", fontSize: 12, bold: true, color: DARK, align: "center", valign: "middle" });
+  s.addShape("line", { x: 2.7, y: 2.9, w: 0.75, h: 0, line: { color: DARK, width: 1.5, endArrowType: "triangle" } });
+  s.addText("HTTP :80", { x: 2.62, y: 2.45, w: 0.95, h: 0.3, fontFace: "Calibri", fontSize: 10, color: MUTE, align: "center" });
+
+  // Instancia EC2
+  s.addShape("roundRect", { x: 3.45, y: 1.95, w: 5.35, h: 4.75, rectRadius: 0.06, fill: { color: OFFWHITE }, line: { color: BORDER, width: 1 } });
+  s.addText("Instancia EC2 · Amazon Linux 2023", { x: 3.65, y: 2.0, w: 5.0, h: 0.4, fontFace: "Calibri", fontSize: 11.5, bold: true, color: MUTE });
+  s.addShape("roundRect", { x: 3.7, y: 2.5, w: 4.85, h: 0.8, rectRadius: 0.06, fill: { color: TEAL }, line: { type: "none" } });
+  s.addText([
+    { text: "Apache httpd", options: { bold: true, breakLine: true } },
+    { text: "VirtualHost priomed.<IP>.nip.io", options: { fontSize: 10.5 } },
+  ], { x: 3.7, y: 2.5, w: 4.85, h: 0.8, fontFace: "Calibri", fontSize: 12.5, color: WHITE, align: "center", valign: "middle" });
+  s.addShape("line", { x: 4.83, y: 3.3, w: 0, h: 0.4, line: { color: DARK, width: 1.25, endArrowType: "triangle" } });
+  s.addShape("line", { x: 7.42, y: 3.3, w: 0, h: 0.4, line: { color: DARK, width: 1.25, endArrowType: "triangle" } });
+  s.addShape("roundRect", { x: 3.7, y: 3.7, w: 2.25, h: 1.05, rectRadius: 0.06, fill: { color: WHITE }, line: { color: TEAL, width: 1.25 } });
+  s.addText([
+    { text: "Portal web", options: { bold: true, breakLine: true } },
+    { text: "index.html + documentación", options: { fontSize: 10, color: MUTE } },
+  ], { x: 3.7, y: 3.7, w: 2.25, h: 1.05, fontFace: "Calibri", fontSize: 12, color: DARK, align: "center", valign: "middle" });
+  s.addShape("roundRect", { x: 6.3, y: 3.7, w: 2.25, h: 1.05, rectRadius: 0.06, fill: { color: DARK }, line: { type: "none" } });
+  s.addText([
+    { text: "Classification Service", options: { bold: true, breakLine: true } },
+    { text: "FastAPI · /classify", options: { fontSize: 10, color: "C7DCDD" } },
+  ], { x: 6.3, y: 3.7, w: 2.25, h: 1.05, fontFace: "Calibri", fontSize: 12, color: WHITE, align: "center", valign: "middle" });
+
+  s.addText("Contenedores Docker (puertos solo en 127.0.0.1)", { x: 3.7, y: 4.95, w: 4.85, h: 0.35, fontFace: "Calibri", fontSize: 10.5, italic: true, color: MUTE });
+  [["PostgreSQL", 3.7], ["Redis", 6.3]].forEach(([name, x]) => {
+    s.addShape("roundRect", { x, y: 5.35, w: 2.25, h: 0.75, rectRadius: 0.06, fill: { color: "E3F1F0" }, line: { color: BORDER, width: 1, dashType: "dash" } });
+    s.addText(name, { x, y: 5.35, w: 2.25, h: 0.75, fontFace: "Calibri", fontSize: 12, bold: true, color: TEAL, align: "center", valign: "middle" });
+  });
+  s.addText("Listos para las fases siguientes; el servicio aún no los usa.", { x: 3.7, y: 6.15, w: 4.85, h: 0.4, fontFace: "Calibri", fontSize: 10, color: MUTE });
+
+  // Datos clave
+  const facts = [
+    { n: "23", d: "pruebas automatizadas pasan, incluida la garantía estadística del umbral" },
+    { n: "3 / 3", d: "contenedores sanos, con reinicio automático tras reiniciar la VM" },
+    { n: "2", d: "puertos abiertos a internet (SSH y HTTP); API, base de datos y caché son internas" },
+  ];
+  facts.forEach((f, i) => {
+    const y = 2.0 + i * 1.5;
+    s.addText(f.n, { x: 9.2, y, w: 3.5, h: 0.65, fontFace: "Cambria", fontSize: 30, bold: true, color: TEAL, margin: 0 });
+    s.addText(f.d, { x: 9.2, y: y + 0.65, w: 3.5, h: 0.7, fontFace: "Calibri", fontSize: 11.5, color: INK, lineSpacingMultiple: 1.15, margin: 0, valign: "top" });
+  });
+
+  pageNum(s);
+}
+
+// ---------- Slide 13: El portal ----------
+{
+  const s = newSlide();
+  lightBg(s);
+  kicker(s, "Prototipo Fase 0 · Portal web");
+  title(s, "El revisor ve por qué se priorizó cada remisión");
+
+  s.addImage({ path: "portal_decision.png", x: 0.6, y: 1.9, w: 6.61, h: 5.0 });
+  s.addShape("rect", { x: 0.6, y: 1.9, w: 6.61, h: 5.0, fill: { type: "none" }, line: { color: BORDER, width: 1 } });
+
+  const pts = [
+    { h: "Prioridad en colores de triage", d: "Rojo, ámbar o verde, con una frase que explica la decisión y quién la tomó: la regla o el modelo.", c: ORANGE },
+    { h: "La nota, releída", d: "Frases de alarma resaltadas y negadas tachadas: «sin dolor torácico» no cuenta, «falta de aire» sí.", c: TEAL },
+    { h: "Riesgo frente al umbral", d: "P(alta) del modelo comparada con el umbral Neyman-Pearson calibrado (0,169).", c: SEA },
+    { h: "Siempre revisión humana", d: "La sugerencia nunca se aplica sola: un profesional la confirma o la corrige.", c: MUTE },
+  ];
+  pts.forEach((pt, i) => {
+    const y = 1.95 + i * 1.18;
+    s.addShape("ellipse", { x: 7.65, y: y + 0.08, w: 0.22, h: 0.22, fill: { color: pt.c }, line: { type: "none" } });
+    s.addText(pt.h, { x: 8.05, y, w: 4.7, h: 0.38, fontFace: "Calibri", fontSize: 13.5, bold: true, color: DARK, margin: 0, valign: "middle" });
+    s.addText(pt.d, { x: 8.05, y: y + 0.4, w: 4.7, h: 0.7, fontFace: "Calibri", fontSize: 11.5, color: INK, lineSpacingMultiple: 1.15, margin: 0, valign: "top" });
+  });
+  s.addText([
+    { text: "Nuevo en la API: ", options: { bold: true, color: TEAL } },
+    { text: "evidence (frases encontradas y si están negadas) y high_threshold.", options: { color: INK } },
+  ], { x: 7.65, y: 6.55, w: 5.1, h: 0.35, fontFace: "Calibri", fontSize: 10.5, margin: 0 });
+
+  pageNum(s);
+}
+
+// ---------- Slide 14: Resultados con datos sintéticos ----------
+{
+  const s = newSlide();
+  lightBg(s);
+  kicker(s, "Prototipo Fase 0 · Evaluación");
+  title(s, "Con el umbral Neyman-Pearson se cumple la meta del 95 %");
+
+  s.addChart(pres.charts.BAR, [{
+    name: "Sensibilidad en prioridad alta",
+    labels: ["Urgencia registrada (S0)", "Solo reglas (S1)", "ML con argmax (S2)", "ML + umbral NP (S3)", "Reglas + ML (S4)", "PrioMed completo (S5)"],
+    values: [0.755, 0.934, 0.899, 0.971, 0.918, 0.971],
+  }], {
+    x: 0.6, y: 1.85, w: 7.7, h: 4.6, barDir: "bar",
+    chartColors: [TEAL],
+    showTitle: true, title: "Sensibilidad en remisiones de alta prioridad", titleFontSize: 12, titleColor: DARK, titleFontFace: "Calibri",
+    showValue: true, dataLabelPosition: "outEnd", dataLabelFormatCode: "0.000", dataLabelFontSize: 10, dataLabelColor: INK, dataLabelFontFace: "Calibri",
+    valAxisMinVal: 0.5, valAxisMaxVal: 1.0, valAxisMajorUnit: 0.1, valAxisLabelFormatCode: "0.0", valAxisLabelFontSize: 10, valAxisLabelColor: MUTE, valAxisLabelFontFace: "Calibri",
+    catAxisLabelFontSize: 11, catAxisLabelColor: INK, catAxisLabelFontFace: "Calibri", catAxisOrientation: "maxMin",
+    valGridLine: { color: "E3ECEC", size: 0.75 }, catGridLine: { style: "none" }, showLegend: false, barGapWidthPct: 60,
+  });
+  s.addText("3000 remisiones sintéticas de prueba · α = δ = 0,05", { x: 0.6, y: 6.5, w: 7.7, h: 0.35, fontFace: "Calibri", fontSize: 10, color: MUTE, margin: 0 });
+
+  const kpis = [
+    { n: "0,971", d: "sensibilidad de PrioMed en prioridad alta (meta ≥ 0,95)", c: TEAL },
+    { n: "3,2 %", d: "de falsas alarmas: el costo aceptado, resuelto en la revisión humana", c: ORANGE },
+    { n: "0,915 → 0,934", d: "solo reglas, tras corregir el alcance de la negación", c: SEA },
+  ];
+  kpis.forEach((k, i) => {
+    const y = 1.95 + i * 1.4;
+    s.addText(k.n, { x: 8.75, y, w: 4.0, h: 0.62, fontFace: "Cambria", fontSize: 28, bold: true, color: k.c, margin: 0 });
+    s.addText(k.d, { x: 8.75, y: y + 0.62, w: 4.0, h: 0.65, fontFace: "Calibri", fontSize: 11.5, color: INK, lineSpacingMultiple: 1.15, margin: 0, valign: "top" });
+  });
+  s.addShape("roundRect", { x: 8.75, y: 6.15, w: 4.0, h: 0.7, rectRadius: 0.06, fill: { color: OFFWHITE }, line: { color: BORDER, width: 1 } });
+  s.addText("Datos sintéticos: validan el mecanismo, no el desempeño clínico.", { x: 8.9, y: 6.15, w: 3.75, h: 0.7, fontFace: "Calibri", fontSize: 10.5, italic: true, color: MUTE, valign: "middle", margin: 0 });
+
+  pageNum(s);
+}
+
+// ---------- Slide 15: Seguridad ----------
+{
+  const s = newSlide();
   darkBg(s);
   s.addText("SECCIÓN 6.4 · SEGURIDAD Y PRIVACIDAD", {
     x: 0.6, y: 0.45, w: 8, h: 0.35, fontFace: "Calibri", fontSize: 13, bold: true, color: SEA, charSpacing: 2,
@@ -405,39 +539,39 @@ function title(slide, text, opts = {}) {
     s.addText(it.d, { x: x + 0.25, y: y + 0.75, w: cardW - 0.5, h: 1.15, fontFace: "Calibri", fontSize: 11, color: "C7DCDD", lineSpacingMultiple: 1.2 });
   });
 
-  pageNum(s, 12);
+  pageNum(s);
 }
 
-// ---------- Slide 13: Próximos pasos ----------
+// ---------- Slide 16: Próximos pasos ----------
 {
-  const s = pres.addSlide();
+  const s = newSlide();
   lightBg(s);
   kicker(s, "Sección 8 · Próximos pasos");
-  title(s, "De la propuesta arquitectónica al prototipo evaluable");
+  title(s, "Del prototipo sintético a un piloto con datos reales");
 
   const steps = [
-    "Profundizar el estado del arte con literatura académica indexada",
-    "Revisar en detalle el Anexo Técnico del MGTE para calibrar el guardrail de reglas",
-    "Completar el Digital Opportunity Canvas y validar la arquitectura contra él",
-    "Explorar datos abiertos o sintéticos (RIPS, SISPRO, Así Vamos en Salud)",
-    "Definir con precisión los criterios de riesgo y métricas de evaluación",
-    "Construir el prototipo Fase 0 (guardrail + ML clásico) y recolectar evidencia",
+    "Validar con profesionales clínicos la lista de señales de alarma y su severidad",
+    "Revisar el Anexo Técnico del MGTE para calibrar el guardrail de reglas",
+    "Reemplazar los datos sintéticos por datos abiertos o anonimizados (RIPS, SISPRO)",
+    "Medir la sensibilidad por motivo de consulta, no solo en total",
+    "Agregar el servicio de explicación (LLM) sobre la evidencia que ya expone la API",
+    "Llevar el despliegue a la arquitectura objetivo: ALB, Auto Scaling, RDS y HTTPS",
   ];
   steps.forEach((t, i) => {
     const col = i % 2, row = Math.floor(i / 2);
     const x = 0.6 + col * 6.05, y = 2.0 + row * 1.45;
     s.addShape("roundRect", { x, y, w: 5.75, h: 1.2, rectRadius: 0.07, fill: { color: OFFWHITE }, line: { color: BORDER, width: 1 } });
-    s.addShape("ellipse", { x: x + 0.22, y: y + 0.42, w: 0.36, h: 0.36, fill: { color: i === 5 ? ORANGE : TEAL }, line: { type: "none" } });
+    s.addShape("ellipse", { x: x + 0.22, y: y + 0.42, w: 0.36, h: 0.36, fill: { color: i === 4 ? ORANGE : TEAL }, line: { type: "none" } });
     s.addText(String(i + 1), { x: x + 0.22, y: y + 0.42, w: 0.36, h: 0.36, fontFace: "Calibri", fontSize: 13, bold: true, color: WHITE, align: "center", valign: "middle" });
     s.addText(t, { x: x + 0.75, y: y + 0.14, w: 4.85, h: 0.95, fontFace: "Calibri", fontSize: 12, color: INK, valign: "middle", lineSpacingMultiple: 1.15 });
   });
 
-  pageNum(s, 13);
+  pageNum(s);
 }
 
-// ---------- Slide 14: Cierre ----------
+// ---------- Slide 17: Cierre ----------
 {
-  const s = pres.addSlide();
+  const s = newSlide();
   darkBg(s);
   s.addShape("ellipse", { x: 9.5, y: -1.5, w: 4.5, h: 4.5, fill: { color: TEAL, transparency: 72 }, line: { type: "none" } });
 
@@ -448,4 +582,21 @@ function title(slide, text, opts = {}) {
   s.addText("Gracias.", { x: 0.9, y: 5.1, w: 6, h: 0.6, fontFace: "Cambria", fontSize: 18, italic: true, color: SEA });
 }
 
-pres.writeFile({ fileName: "PrioMed_Presentacion.pptx" }).then(() => console.log("done"));
+// ---------- Notas del orador: secciones "## N · Título" de speech/guion_exposicion.md ----------
+{
+  const guion = fs.readFileSync(path.join(__dirname, "..", "speech", "guion_exposicion.md"), "utf8").replace(/\r\n/g, "\n");
+  const notes = {};
+  for (const block of guion.split(/^## /m).slice(1)) {
+    const m = block.match(/^(\d+) · [^\n]*\n([\s\S]*)$/);
+    if (!m) continue;
+    notes[Number(m[1])] = m[2].trim().split(/\n{2,}/).map((p) => p.replace(/\n/g, " ")).join("\n\n");
+  }
+  slides.forEach((s, i) => {
+    if (!notes[i + 1]) throw new Error(`Falta el guion de la diapositiva ${i + 1}`);
+    s.addNotes(notes[i + 1]);
+  });
+}
+
+pres
+  .writeFile({ fileName: path.join(__dirname, "PrioMed_Presentacion.pptx") })
+  .then(() => console.log(`done: ${slides.length} diapositivas`));
