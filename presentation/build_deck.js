@@ -443,7 +443,114 @@ function title(slide, text, opts = {}) {
   pageNum(s);
 }
 
-// ---------- Slide 13: El portal ----------
+// ---------- Slide 13: Por dentro, el recorrido de una remisión ----------
+{
+  const s = newSlide();
+  lightBg(s);
+  kicker(s, "Por dentro del servicio");
+  title(s, "El recorrido de una remisión, paso a paso");
+
+  const HIGHC = "C4302B", MEDC = "B87400";
+  const X0 = 0.6, XA = 5.0, XB = 8.95, WA = 3.8, WB = 3.8;
+
+  // Encabezados con las dos remisiones de ejemplo
+  [[XA, "Remisión A", "«Sin alergias conocidas. Disnea severa desde ayer.»"],
+   [XB, "Remisión B", "«Refiere fiebre alta y vómitos persistentes de tres días.»"]].forEach(([x, h, note]) => {
+    s.addShape("roundRect", { x, y: 1.8, w: WA, h: 0.85, rectRadius: 0.06, fill: { color: DARK }, line: { type: "none" } });
+    s.addText([
+      { text: h + "  ", options: { bold: true, color: SEA } },
+      { text: "urgencia registrada: baja", options: { color: "C7DCDD", fontSize: 10 } },
+    ], { x: x + 0.15, y: 1.84, w: WA - 0.3, h: 0.32, fontFace: "Calibri", fontSize: 12, margin: 0, valign: "middle" });
+    s.addText(note, { x: x + 0.15, y: 2.16, w: WA - 0.3, h: 0.45, fontFace: "Cambria", fontSize: 11, italic: true, color: WHITE, margin: 0, valign: "middle" });
+  });
+
+  const rows = [
+    { h: "Normalizar el texto", d: "Minúsculas y sin tildes; la puntuación marca el fin de cada cláusula",
+      a: "sin alergias conocidas | disnea severa desde ayer", b: "refiere fiebre alta y vomitos persistentes de tres dias" },
+    { h: "Buscar señales de alarma", d: "16 frases de 5 señales, comparadas como palabras completas",
+      a: "Encuentra «disnea»: dificultad respiratoria", b: "Ninguna señal de alarma" },
+    { h: "Revisar negaciones", d: "«sin», «niega», «no refiere»… justo antes y en la misma cláusula",
+      a: "«sin» está en la cláusula anterior: no la niega", b: "No aplica" },
+    { h: "Regla de alarma", d: "Una señal sin negar fija la prioridad alta, diga lo que diga el modelo",
+      a: "Se dispara: prioridad alta", b: "No se dispara" },
+    { h: "Modelo de riesgo", d: "TF-IDF + regresión logística: probabilidad de baja, media y alta",
+      a: "P(alta) = 0,74 (se calcula y se reporta)", b: "P(media) = 0,94  ·  P(alta) = 0,03" },
+    { h: "Umbral Neyman-Pearson", d: "Alta si P(alta) ≥ 0,169; si no, la más probable entre media y baja",
+      a: "No aplica: ya decidió la regla", b: "0,03 < 0,169: queda la más probable, media" },
+  ];
+  const y0 = 2.8, rh = 0.58;
+  rows.forEach((r, i) => {
+    const y = y0 + i * rh;
+    if (i % 2 === 0) s.addShape("rect", { x: X0, y, w: 12.15, h: rh, fill: { color: OFFWHITE }, line: { type: "none" } });
+    s.addShape("ellipse", { x: X0 + 0.1, y: y + 0.15, w: 0.28, h: 0.28, fill: { color: TEAL }, line: { type: "none" } });
+    s.addText(String(i + 1), { x: X0 + 0.1, y: y + 0.15, w: 0.28, h: 0.28, fontFace: "Calibri", fontSize: 10.5, bold: true, color: WHITE, align: "center", valign: "middle", margin: 0 });
+    s.addText(r.h, { x: X0 + 0.52, y: y + 0.04, w: 3.8, h: 0.25, fontFace: "Calibri", fontSize: 11.5, bold: true, color: DARK, margin: 0, valign: "middle" });
+    s.addText(r.d, { x: X0 + 0.52, y: y + 0.29, w: 3.85, h: 0.27, fontFace: "Calibri", fontSize: 9.5, color: MUTE, margin: 0, valign: "top" });
+    s.addText(r.a, { x: XA + 0.15, y, w: WA - 0.3, h: rh, fontFace: "Calibri", fontSize: 11, color: INK, margin: 0, valign: "middle" });
+    s.addText(r.b, { x: XB + 0.15, y, w: WB - 0.3, h: rh, fontFace: "Calibri", fontSize: 11, color: INK, margin: 0, valign: "middle" });
+  });
+
+  // Resultado
+  const yr = y0 + rows.length * rh + 0.12;
+  s.addText([
+    { text: "Resultado", options: { bold: true, color: DARK, breakLine: true } },
+    { text: "siempre con revisión humana", options: { fontSize: 9.5, color: MUTE } },
+  ], { x: X0 + 0.52, y: yr, w: 3.8, h: 0.62, fontFace: "Calibri", fontSize: 12, margin: 0, valign: "middle" });
+  [[XA, "ALTA", "decidió la regla de alarma", HIGHC], [XB, "MEDIA", "decidió el modelo con el umbral", MEDC]].forEach(([x, p, who, c]) => {
+    s.addShape("roundRect", { x, y: yr, w: WA, h: 0.62, rectRadius: 0.06, fill: { color: WHITE }, line: { color: c, width: 1.5 } });
+    s.addText([
+      { text: p + "  ", options: { bold: true, color: c, fontSize: 16 } },
+      { text: who, options: { color: INK, fontSize: 11 } },
+    ], { x: x + 0.15, y: yr, w: WA - 0.3, h: 0.62, fontFace: "Calibri", margin: 0, valign: "middle" });
+  });
+
+  pageNum(s);
+}
+
+// ---------- Slide 14: Cómo aprende el modelo y cómo se fija el umbral ----------
+{
+  const s = newSlide();
+  lightBg(s);
+  kicker(s, "Por dentro del servicio");
+  title(s, "Cómo aprende el modelo y cómo se fija el umbral");
+
+  s.addText("Al arrancar, el servicio:", { x: 0.6, y: 1.85, w: 5.6, h: 0.35, fontFace: "Calibri", fontSize: 13, bold: true, color: TEAL, margin: 0 });
+  const steps = [
+    { h: "Genera 6000 remisiones sintéticas", d: "20 motivos de consulta, 5 de ellos de alta severidad. Con ruido a propósito: 5 % de etiquetas alteradas, 30 % de casos graves con la urgencia mal registrada y 15 % de frases que no están en el diccionario." },
+    { h: "Entrena el modelo", d: "Convierte cada nota en 1685 términos (palabras y pares de palabras) más la urgencia registrada, y ajusta una regresión logística de tres clases." },
+    { h: "Calibra el umbral con otro lote", d: "Toma los 389 casos graves de 3000 remisiones nuevas y elige el corte más alto que, con 95 % de confianza, deja escapar como máximo el 5 % de los casos graves." },
+  ];
+  steps.forEach((st, i) => {
+    const y = 2.35 + i * 1.5;
+    s.addShape("ellipse", { x: 0.6, y: y + 0.02, w: 0.42, h: 0.42, fill: { color: i === 2 ? ORANGE : TEAL }, line: { type: "none" } });
+    s.addText(String(i + 1), { x: 0.6, y: y + 0.02, w: 0.42, h: 0.42, fontFace: "Cambria", fontSize: 14, bold: true, color: WHITE, align: "center", valign: "middle", margin: 0 });
+    s.addText(st.h, { x: 1.2, y, w: 5.0, h: 0.42, fontFace: "Calibri", fontSize: 13.5, bold: true, color: DARK, margin: 0, valign: "middle" });
+    s.addText(st.d, { x: 1.2, y: y + 0.45, w: 5.0, h: 0.95, fontFace: "Calibri", fontSize: 11, color: INK, lineSpacingMultiple: 1.15, margin: 0, valign: "top" });
+  });
+
+  const counts = [12, 17, 14, 11, 18, 24, 20, 34, 239];
+  s.addChart(pres.charts.BAR, [{
+    name: "Casos graves",
+    labels: ["< 0,169", "0,169–0,3", "0,3–0,4", "0,4–0,5", "0,5–0,6", "0,6–0,7", "0,7–0,8", "0,8–0,9", "0,9–1"],
+    values: counts,
+  }], {
+    x: 6.6, y: 1.85, w: 6.15, h: 3.75, barDir: "col",
+    chartColors: [ORANGE, TEAL, TEAL, TEAL, TEAL, TEAL, TEAL, TEAL, TEAL],
+    showTitle: true, title: "P(alta) de los 389 casos graves de calibración", titleFontSize: 12, titleColor: DARK, titleFontFace: "Calibri",
+    showValue: true, dataLabelPosition: "outEnd", dataLabelFontSize: 10, dataLabelColor: INK, dataLabelFontFace: "Calibri",
+    catAxisLabelFontSize: 10, catAxisLabelColor: INK, catAxisLabelFontFace: "Calibri",
+    valAxisHidden: true, valGridLine: { style: "none" }, catGridLine: { style: "none" }, showLegend: false, barGapWidthPct: 25,
+  });
+  s.addShape("roundRect", { x: 6.6, y: 5.75, w: 6.15, h: 1.1, rectRadius: 0.06, fill: { color: OFFWHITE }, line: { color: BORDER, width: 1 } });
+  s.addText([
+    { text: "Umbral = 0,169", options: { bold: true, color: ORANGE, breakLine: true } },
+    { text: "es el 13.º puntaje más bajo de los 389: por debajo quedan 12 casos (3,1 %), en naranja. Se elige el mayor k con P(Binomial(389; 0,05) ≤ k − 1) ≤ 0,05, y resulta k = 13.", options: { color: INK } },
+  ], { x: 6.8, y: 5.8, w: 5.8, h: 1.0, fontFace: "Calibri", fontSize: 11, margin: 0, valign: "middle", lineSpacingMultiple: 1.1 });
+
+  pageNum(s);
+}
+
+// ---------- Slide 15: El portal ----------
 {
   const s = newSlide();
   lightBg(s);
@@ -473,7 +580,7 @@ function title(slide, text, opts = {}) {
   pageNum(s);
 }
 
-// ---------- Slide 14: Resultados con datos sintéticos ----------
+// ---------- Slide 16: Resultados con datos sintéticos ----------
 {
   const s = newSlide();
   lightBg(s);
@@ -511,7 +618,7 @@ function title(slide, text, opts = {}) {
   pageNum(s);
 }
 
-// ---------- Slide 15: Seguridad ----------
+// ---------- Slide 17: Seguridad ----------
 {
   const s = newSlide();
   darkBg(s);
@@ -542,7 +649,7 @@ function title(slide, text, opts = {}) {
   pageNum(s);
 }
 
-// ---------- Slide 16: Próximos pasos ----------
+// ---------- Slide 18: Próximos pasos ----------
 {
   const s = newSlide();
   lightBg(s);
@@ -569,7 +676,7 @@ function title(slide, text, opts = {}) {
   pageNum(s);
 }
 
-// ---------- Slide 17: Cierre ----------
+// ---------- Slide 19: Cierre ----------
 {
   const s = newSlide();
   darkBg(s);

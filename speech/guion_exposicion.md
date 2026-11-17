@@ -1,6 +1,6 @@
 # Guion de exposición — PrioMed
 
-17 diapositivas · unos 14 minutos a ritmo tranquilo · más una demostración opcional de 2 minutos.
+19 diapositivas · unos 17 minutos a ritmo tranquilo · más una demostración opcional de 2 minutos.
 
 Cada sección corresponde a una diapositiva. `presentation/build_deck.js` copia este texto como notas
 del orador, así que en PowerPoint se ve en la vista del presentador. Las frases entre corchetes son
@@ -130,7 +130,56 @@ Desde internet solo están abiertos los puertos de SSH y HTTP; la API, la base d
 se alcanzan desde la misma máquina. El código tiene 23 pruebas automatizadas que pasan, y comprobé
 que todo vuelve a arrancar solo después de reiniciar la máquina.
 
-## 13 · El portal
+## 13 · Por dentro: el recorrido de una remisión
+
+Ahora quiero mostrarles qué pasa por dentro cuando llega una remisión. Voy a seguir dos notas reales
+del prototipo, las dos con urgencia registrada baja.
+
+Primero, el servicio normaliza el texto: lo pasa a minúsculas, le quita las tildes y convierte la
+puntuación en cortes de cláusula. Ese detalle es importante, como verán en un momento.
+
+Segundo, busca señales de alarma. Tiene un diccionario de 16 frases que describen 5 señales: dolor
+torácico, ideación suicida, dificultad respiratoria, síncope y herida por arma de fuego. En la remisión
+A encuentra la palabra "disnea", que es dificultad respiratoria. En la B no encuentra ninguna.
+
+Tercero, revisa si la señal está negada: busca palabras como "sin", "niega" o "no refiere" justo antes
+de la frase, pero solo dentro de la misma cláusula. En la remisión A, el "sin" pertenece a "sin
+alergias conocidas", que es otra cláusula, así que la disnea sigue activa.
+
+Cuarto, la regla de alarma: si hay una señal activa, la prioridad es alta y ahí termina la decisión. Es
+lo que pasa con la remisión A.
+
+Si no hay señal, decide el modelo. El quinto paso estima la probabilidad de cada prioridad a partir de
+las palabras de la nota y de la urgencia registrada. Para la remisión B, la probabilidad de prioridad
+media es 0,94 y la de alta apenas 0,03. Y el sexto paso aplica el umbral: como 0,03 está por debajo de
+0,169, no se eleva a alta y queda la prioridad más probable, media.
+
+En los dos casos la respuesta trae la prioridad, quién la decidió, las frases encontradas y el aviso
+de que una persona debe revisarla.
+
+## 14 · Cómo aprende el modelo y cómo se fija el umbral
+
+¿De dónde salen esas probabilidades y ese 0,169? Todo ocurre cuando el servicio arranca, en unos
+segundos.
+
+Primero genera 6000 remisiones sintéticas a partir de 20 motivos de consulta. Les agrega ruido a
+propósito para que el problema no sea fácil: un 5 % de etiquetas alteradas, un 30 % de casos graves en
+los que el médico registró mal la urgencia, y un 15 % de frases que no están en el diccionario de
+alarmas.
+
+Con eso entrena el modelo: convierte cada nota en unos 1700 términos, palabras y pares de palabras, le
+suma la urgencia registrada y ajusta una regresión logística de tres clases.
+
+Luego calibra el umbral con un lote distinto: toma los 389 casos graves de 3000 remisiones nuevas y mira
+la probabilidad de alta que les da el modelo. Esa es la gráfica de la derecha: la mayoría está cerca de
+uno, pero algunos casos graves reciben puntajes bajos. El método Neyman-Pearson elige el corte más alto
+que, con 95 % de confianza, deja escapar como máximo el 5 % de los casos graves. Ese corte es el
+decimotercer puntaje más bajo, 0,169, y por debajo de él quedan solo 12 casos de 389.
+
+Así, el umbral no es un número que yo escogí a ojo: sale de una garantía estadística que además está
+comprobada en las pruebas automatizadas.
+
+## 15 · El portal
 
 Este es el portal. A la izquierda, el médico escribe la nota de la remisión y la urgencia que
 registró. A la derecha aparece la prioridad sugerida, en colores de triage, con una frase que dice
@@ -148,14 +197,14 @@ persona debe revisar la sugerencia.
 severa", clasificar y mostrar que la disnea sale resaltada. Luego usar el ejemplo de rinorrea con
 urgencia alta para mostrar que el modelo sugiere baja.]
 
-## 14 · Resultados con datos sintéticos
+## 16 · Resultados con datos sintéticos
 
 ¿Funciona? Esta es la sensibilidad para los casos de alta prioridad sobre 3000 remisiones sintéticas
 de prueba.
 
 La urgencia que registra el médico, por sí sola, detecta el 75,5 % de los casos graves. Con solo reglas
 llegamos a 93,4 % y con machine learning a 89,9 %. Cuando el modelo usa el umbral Neyman-Pearson,
-calibrado para no dejar pasar más del 5 % de los casos graves, la sensibilidad sube a 97,1 % y cumple
+que acabamos de ver, la sensibilidad sube a 97,1 % y cumple
 la meta del 95 %. El costo es aceptar 3,2 % de falsas alarmas, que se resuelven en la revisión humana.
 
 Construyendo el portal encontré y corregí un error: una negación como "sin alergias conocidas"
@@ -165,7 +214,7 @@ ocultaba la alarma de la frase siguiente. Con la corrección, la sensibilidad de
 Quiero ser honesto con la limitación: los datos son sintéticos, así que esto valida el mecanismo,
 no el desempeño clínico real.
 
-## 15 · Seguridad
+## 17 · Seguridad
 
 La seguridad está diseñada como controles técnicos y no solo como políticas: autenticación con JWT y
 OAuth2, autorización por institución, cifrado en tránsito y en reposo, auditoría con alertas, y
@@ -175,7 +224,7 @@ Un punto clave es la anonimización: el umbral mínimo de remisiones para report
 aplica dentro del servicio, de modo que un conteo pequeño, que podría identificar a alguien, nunca
 llega al regulador.
 
-## 16 · Próximos pasos
+## 18 · Próximos pasos
 
 Los próximos pasos son seis. Validar con profesionales clínicos la lista de señales de alarma y
 revisar el Anexo Técnico del MGTE para calibrar las reglas. Reemplazar los datos sintéticos por datos
@@ -186,7 +235,7 @@ Además, agregar el servicio de explicación con el modelo de lenguaje, que ya t
 necesita gracias al portal. Y llevar el despliegue a la arquitectura objetivo, con balanceador, auto
 escalado y HTTPS.
 
-## 17 · Cierre
+## 19 · Cierre
 
 Para cerrar: PrioMed propone una forma transparente, auditable y clínicamente defendible de priorizar
 el acceso a consulta especializada. Las reglas protegen los casos graves, el modelo aporta donde las
@@ -211,6 +260,10 @@ falsas alarmas.
 **¿Por qué no está en AWS completo, con balanceador y auto escalado?** Por las restricciones de AWS
 Academy. Se desplegó la configuración reducida de la fase 0; la arquitectura objetivo está
 documentada y es el siguiente paso.
+
+**¿Qué pasa si el médico describe una alarma con otras palabras?** La regla no la ve, porque solo
+conoce las frases de su diccionario. Para eso está el modelo: en una prueba con frases que no aparecen
+ni en el diccionario ni en el entrenamiento, el pipeline completo mantuvo una sensibilidad de 96 %.
 
 **¿Los datos son reales?** No. Son remisiones sintéticas generadas a partir de la caracterización
 clínica preliminar. Validan el mecanismo, no el desempeño clínico.

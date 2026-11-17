@@ -15,8 +15,9 @@ El artículo incluye la sección 7.5 «Referral Portal Prototype», que describe
 prototipo (Figuras 4 y 5, tomadas del despliegue en EC2), y ya embebe la versión corregida de la
 Figura 2.
 
-La presentación (17 diapositivas) incluye el prototipo desplegado: arquitectura real en EC2, el
-portal web y los resultados sobre datos sintéticos. El guion de `speech/guion_exposicion.md` se
+La presentación (19 diapositivas) incluye el prototipo desplegado: arquitectura real en EC2, cómo
+funciona el servicio por dentro (recorrido de una remisión, entrenamiento y calibración del umbral),
+el portal web y los resultados sobre datos sintéticos. El guion de `speech/guion_exposicion.md` se
 copia como notas del orador al generar la presentación: cada sección `## N · Título` corresponde a
 la diapositiva N, así que si editas el guion vuelve a generar el .pptx.
 
