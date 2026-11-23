@@ -21,6 +21,9 @@ el portal web y los resultados sobre datos sintéticos. El guion de `speech/guio
 copia como notas del orador al generar la presentación: cada sección `## N · Título` corresponde a
 la diapositiva N, así que si editas el guion vuelve a generar el .pptx.
 
+La Figura 2 (`figures/fig2_application.png`) se corrigió a mano después de generarla, así que
+`make_fig2.py` ya no la reproduce: no la regeneres con el script sin aplicar antes esa corrección.
+
 Regenerar figuras: `cd figures/source && python make_fig1.py && python make_fig2.py && python make_fig3.py`
 (requiere matplotlib). Regenerar la presentación: `cd presentation && node build_deck.js` (requiere pptxgenjs).
 
