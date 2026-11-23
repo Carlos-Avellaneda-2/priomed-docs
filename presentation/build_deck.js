@@ -395,10 +395,10 @@ function title(slide, text, opts = {}) {
   title(s, "Del plan al prototipo: lo que está desplegado hoy");
 
   // Navegador
-  s.addShape("roundRect", { x: 0.6, y: 2.45, w: 2.1, h: 0.9, rectRadius: 0.07, fill: { color: WHITE }, line: { color: DARK, width: 1.25 } });
-  s.addText("Revisor\n(navegador)", { x: 0.6, y: 2.45, w: 2.1, h: 0.9, fontFace: "Calibri", fontSize: 12, bold: true, color: DARK, align: "center", valign: "middle" });
-  s.addShape("line", { x: 2.7, y: 2.9, w: 0.75, h: 0, line: { color: DARK, width: 1.5, endArrowType: "triangle" } });
-  s.addText("HTTP :80", { x: 2.62, y: 2.45, w: 0.95, h: 0.3, fontFace: "Calibri", fontSize: 10, color: MUTE, align: "center" });
+  s.addShape("roundRect", { x: 0.6, y: 2.45, w: 1.75, h: 0.9, rectRadius: 0.07, fill: { color: WHITE }, line: { color: DARK, width: 1.25 } });
+  s.addText("Revisor\n(navegador)", { x: 0.6, y: 2.45, w: 1.75, h: 0.9, fontFace: "Calibri", fontSize: 12, bold: true, color: DARK, align: "center", valign: "middle" });
+  s.addShape("line", { x: 2.35, y: 2.9, w: 1.1, h: 0, line: { color: DARK, width: 1.5, endArrowType: "triangle" } });
+  s.addText("HTTP / HTTPS", { x: 2.35, y: 2.5, w: 1.1, h: 0.3, fontFace: "Calibri", fontSize: 10, color: MUTE, align: "center", margin: 0 });
 
   // Instancia EC2
   s.addShape("roundRect", { x: 3.45, y: 1.95, w: 5.35, h: 4.75, rectRadius: 0.06, fill: { color: OFFWHITE }, line: { color: BORDER, width: 1 } });
@@ -432,7 +432,7 @@ function title(slide, text, opts = {}) {
   const facts = [
     { n: "23", d: "pruebas automatizadas pasan, incluida la garantía estadística del umbral" },
     { n: "3 / 3", d: "contenedores sanos, con reinicio automático tras reiniciar la VM" },
-    { n: "2", d: "puertos abiertos a internet (SSH y HTTP); API, base de datos y caché son internas" },
+    { n: "3", d: "puertos abiertos a internet (SSH, HTTP y HTTPS); API, base de datos y caché son internas" },
   ];
   facts.forEach((f, i) => {
     const y = 2.0 + i * 1.5;

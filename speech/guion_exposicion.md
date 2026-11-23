@@ -126,7 +126,7 @@ Apache recibe el tráfico y sirve el portal web. Las peticiones de la API pasan 
 clasificación, que corre en un contenedor Docker. PostgreSQL y Redis también corren en contenedores,
 listos para las siguientes fases, aunque el servicio todavía no los usa.
 
-Desde internet solo están abiertos los puertos de SSH y HTTP; la API, la base de datos y la caché solo
+Desde internet solo están abiertos los puertos de SSH, HTTP y HTTPS; la API, la base de datos y la caché solo
 se alcanzan desde la misma máquina. El código tiene 23 pruebas automatizadas que pasan, y comprobé
 que todo vuelve a arrancar solo después de reiniciar la máquina.
 

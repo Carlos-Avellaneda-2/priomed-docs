@@ -1,6 +1,6 @@
 # ADR-001 — Umbral Neyman–Pearson para la clase HIGH
 
-**Estado:** propuesto · **Fecha:** 2026-10-05
+**Estado:** aceptado e implementado (`priomed-classification-service`, `np_threshold.py`) · **Fecha:** 2026-10-05, actualizado 2026-11-23
 
 **Contexto.** El Escenario 1 (Sección 5.4) exige sensibilidad ≥ 95 % en señales de alarma. Un
 umbral argmax maximiza la exactitud global, no controla el error en la clase crítica.
